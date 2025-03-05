@@ -155,3 +155,74 @@ RUN pip install --no-cache-dir -r requirements.txt
 CMD ["python", "app.py"]  
 ```
 This ensures the application runs as `myuser`, not root.
+
+
+# Question 4
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+
+  backend:
+    image: my-backend:latest
+    container_name: node_backend
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgres://myuser:mypassword@postgres:5432/mydatabase
+      REDIS_URL: redis://redis:6379
+      ML_MODEL_PORT: 8080
+    ports:
+      - "5000:5000"
+
+  frontend:
+    image: my-frontend:latest
+    container_name: react_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+  ml_model:
+    image: my-ml-model:latest
+    container_name: python_ml_model
+    restart: always
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
+```
+
+## **Key Features:**
+- **Database (`postgres`)**: Stores backend data, persists across restarts.  
+- **Cache (`redis`)**: Provides fast key-value caching.  
+- **Backend (`backend`)**: Runs Node.js, connects to PostgreSQL and Redis.  
+- **Frontend (`frontend`)**: React app, depends on backend.  
+- **ML Model (`ml_model`)**: Python API, exposed on port 8080.  
+- **Automatic Restart**: Ensures containers restart if they crash.  
+- **Dependency Management**: Ensures services start in the correct order using `depends_on`.  
+- **Environment Variables**: Passes `ML_MODEL_PORT` to the backend.  
