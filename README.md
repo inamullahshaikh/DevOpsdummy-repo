@@ -35,3 +35,25 @@ To ensure a smooth integration, follow these steps:
    ```bash
    git push origin bugfix/issue-123
    ```
+
+# Question 2
+
+Here are the Docker commands for each part:  
+
+### **Part A: Pull and Run the Python Web App with Environment Variables**  
+```bash
+docker pull myteam/python-app  
+docker run -e DEBUG=True -e PORT=5000 -p 5000:5000 myteam/python-app
+```
+
+### **Part B: Run a PostgreSQL Database in Docker**  
+```bash
+docker pull postgres  
+docker run --name postgres -e POSTGRES_PASSWORD=1234 -p 5432:5432 -d postgres
+```
+
+### **Part C: Tag and Push a Docker Image to Docker Hub**  
+```bash
+docker tag myapp:v1 i220857/myapp:v1  
+docker push i220857/myapp:v1
+```
